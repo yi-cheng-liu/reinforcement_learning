@@ -12,36 +12,27 @@ The agent's goal is to find the optimal policy that maximizes the expected disco
 
 Formulation:
 
-- *State $s$*:
+- State $s$:
 
     The state is defined as the grid where the agent is located. $s\in\{0,1,...,63\}$.
     The initial state is $0$ and the terminal state is $6$.
 
+- Action $a$:
+  - $a=0$: the agent plans to move *up*;
+  - $a=1$: the agent plans to move *right*;
+  - $a=2$: the agent plans to move *down*;
+  - $a=3$: the agent plans to move *left*.
 
-
-- *Action $a$*:
-
-    - $a=0$: the agent plans to move *up*;
-    - $a=1$: the agent plans to move *right*;
-    - $a=2$: the agent plans to move *down*;
-    - $a=3$: the agent plans to move *left*.
-
-
-
-- *Transition*:
-    
+- Transition:
     Examples:
-    - If $s=0$ and $a=0$, then the next state will be $s'=0$ (The agent hits the wall);
-    - If $s=0$ and $a=1$, then the next state will be $s'=1$;
-    - If $s=0$ and $a=2$, then the next state will be $s'=8$;
-    - ...
+  - If $s=0$ and $a=0$, then the next state will be $s'=0$ (The agent hits the wall);
+  - If $s=0$ and $a=1$, then the next state will be $s'=1$;
+  - If $s=0$ and $a=2$, then the next state will be $s'=8$;
+  - ...
 
-
-
-- *Random reward $r(s,a)$*:
+- Random reward $r(s,a)$:
 
     $r(5,1) = 10$, $r(7,3) = 10$, $r(14,0) = 10$. Otherwise, $r(s,a)$ is equal to $-1$ with probability $0.5$ and $-2$ with probability $0.5$.
-
 
 - *Objective*: Maximize the expected discounted total reward:
 
@@ -53,4 +44,4 @@ Note that in this problem the state transition is deterministic. Define a determ
 
 Let $V^*(s)$ denote the optimal value function, defined by
 
-$$V^*(s) = \max_{\mu} \mathbb{E} \left[\sum_{t=0}^{\tau - 1} \alpha^t r(s_t,\mu(s_t)) \vert s_0 = s \right]$$
+$$ V^*(s) = \max_{\mu} \mathbb{E} \left[\sum_{t=0}^{\tau - 1} \alpha^t r(s_t,\mu(s_t)) \vert s_0 = s \right] $$
