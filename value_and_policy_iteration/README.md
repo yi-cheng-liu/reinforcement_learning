@@ -1,16 +1,22 @@
-# **1**. A Maze Game in Gridworld (coding)
+# Value and Policy Iteration
+
+## A Maze Game in Gridworld
 
 A $8\times8$  rectangular gridworld map is shown below:
 
 ![gridworld.png](maze.png)
 
-Imagine an agent moving within this $8\times 8$ gridworld, where the grids are numbered from $0$ to $63$, the red lines represent walls, and the green grid (grid $0$) and the blue grid (grid $6$) are the starting point and the destination, respectively. The agent can move up, right, down, or left for each step except that the walls block the agent's path. That is, if there is a wall in the direction that the agent plans to move, the agent will remain in the current cell.
+### Description
+
+Imagine an agent moving within this $8\times 8$ gridworld, where the grids are numbered from $0$ to $63$, the red lines represent walls, and the green grid (grid $0$) and the blue grid (grid $6$) are the starting point and the destination, respectively.
+
+The agent can move up, right, down, or left for each step except that the walls block the agent's path. That is, if there is a wall in the direction that the agent plans to move, the agent will remain in the current cell.
 
 If the agent arrives at grid $6$ (the destination), the agent will receive a reward of $+10$ and the process will terminate. Otherwise, the agent will receive a reward of -1 with probability 0.5 and a reward of -2 with probability 0.5 for each step (including hitting the wall).
 
 The agent's goal is to find the optimal policy that maximizes the expected discounted total reward starting from grid $0$ to grid $6$. The discount factor is $0.9$.
 
-Formulation:
+### Formulation
 
 - State $s$:
 
@@ -18,10 +24,10 @@ Formulation:
     The initial state is $0$ and the terminal state is $6$.
 
 - Action $a$:
-  - $a=0$: the agent plans to move *up*;
-  - $a=1$: the agent plans to move *right*;
-  - $a=2$: the agent plans to move *down*;
-  - $a=3$: the agent plans to move *left*.
+  - $a=0$: the agent plans to move *up* ⬆️;
+  - $a=1$: the agent plans to move *right* ➡️;
+  - $a=2$: the agent plans to move *down* ⬇️;
+  - $a=3$: the agent plans to move *left* ⬅️.
 
 - Transition:
     Examples:
@@ -42,6 +48,25 @@ Formulation:
 
 Note that in this problem the state transition is deterministic. Define a determinitic state transition function $f$ such that $s' = f(s,a)$ where $s$ is the current state, $a$ is the current action, and $s'$ is the next state. For example, $f(0,0)=0$, $f(0,1)=1$.
 
+### Value Function
+
 Let $V^*(s)$ denote the optimal value function, defined by
 
 $$ V^*(s) = \max_{\mu} \mathbb{E} \left[\sum_{t=0}^{\tau - 1} \alpha^t r(s_t,\mu(s_t)) \vert s_0 = s \right] $$
+
+### Run
+
+```bash
+python train.py
+```
+
+```bash
+Your actions during the last episode:
+1 2 2 2 2 2 2 1 1 1 1 1 0 0 3 3 3 3 0 1 1 1 1 0 3 3 3 0 0 1 1 1 
+Your total reward averaged over 500 episodes:
+-14.105
+```
+
+### Results
+
+![result](result.jpg)
