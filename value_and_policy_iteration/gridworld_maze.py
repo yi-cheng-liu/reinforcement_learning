@@ -1,5 +1,5 @@
 import numpy as np
-
+import matplotlib.pyplot as plt
 
 class GridWorldMazeEnv:
     def __init__(self, seed=None):
@@ -82,3 +82,35 @@ class GridWorldMazeEnv:
             else:
                 reward = -2.0
         return self.state, reward, done
+
+    def visualize(self, input):
+        fig, ax = plt.subplots(figsize=(12, 10))
+        grid_visualization = np.zeros((8, 8))
+
+        ax.set_xticks(np.arange(grid_visualization.shape[1]+1)-.5, minor=True)
+        ax.set_yticks(np.arange(grid_visualization.shape[0]+1)-.5, minor=True)
+        ax.grid(which="minor", color="black", linestyle='-', linewidth=2)
+        ax.tick_params(which="minor", size=0)
+
+        ax.tick_params(which="major", bottom=False, left=False, labelbottom=False, labelleft=False)
+        plt.gca().invert_yaxis()
+
+        ax.xaxis.set_ticks_position('none') 
+        ax.yaxis.set_ticks_position('none')
+        ax.set_xticklabels([])
+        ax.set_yticklabels([])
+
+        for idx, val in enumerate(input):
+            row, col = divmod(idx, 8)
+            cell_color = 'white'
+            font_color = 'black'
+            if idx == 0:
+                cell_color = 'green'
+                font_color = 'white'
+            elif idx == self.terminal_state:
+                cell_color = 'blue'
+                font_color = 'white'
+            ax.text(col, row, f"{val:.2f}", va='center', ha='center', backgroundcolor=cell_color, fontsize=14, color=font_color)
+
+        plt.title('Value Iteration Visualization')
+        plt.savefig("value_iteration.png")

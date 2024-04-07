@@ -1,6 +1,5 @@
 import numpy as np
 from gridworld_maze import GridWorldMazeEnv
-env = GridWorldMazeEnv(seed=0)
 
 class GridWorldAgent:
     def __init__(self, env, discount_factor=0.9):
@@ -31,7 +30,7 @@ class GridWorldAgent:
 
                 # Every State have 4 actions: up(0), right(1), down(2), left(3)
                 for cur_action in range(4):
-                    next_state = env.state_transition_func(cur_state, cur_action)
+                    next_state = self.env.state_transition_func(cur_state, cur_action)
                     if (cur_state, cur_action) in [(5, 1), (7, 3), (14, 0)] and next_state == 6:
                         reward = 10
                     else:
@@ -39,10 +38,12 @@ class GridWorldAgent:
                     # Bellman Equation
                     value = reward + alpha * V[next_state]
                     max_value = max(max_value, value)
-                    V[cur_state] = max_value
-                    delta = max(delta, abs(v - V[cur_state]))
+                V[cur_state] = max_value
+                delta = max(delta, abs(v - V[cur_state]))
             if delta < theta:
                 break
+        
+        return V
     
     def policy_v(self, state, V_star):
         """
@@ -60,7 +61,7 @@ class GridWorldAgent:
         best_value = float('-inf')
 
         for cur_action in actions:
-            next_state = env.state_transition_func(state, cur_action)
+            next_state = self.env.state_transition_func(state, cur_action)
             if (state, cur_action) in [(5, 1), (7, 3), (14, 0)] and next_state == 6:
                 reward = 10
             else:
@@ -97,7 +98,7 @@ class GridWorldAgent:
                     if (s == 5 and a == 1) or (s == 7 and a == 3) or (s == 14 and a == 0):
                         V[s] = 10
                     else:
-                        V[s] = -1.5 + 0.9 * V_pre[env.state_transition_func(s, a)]
+                        V[s] = -1.5 + 0.9 * V_pre[self.env.state_transition_func(s, a)]
             error = np.max(np.abs(V_pre - V))
             V_pre = V.copy()
         return V
@@ -111,8 +112,6 @@ class GridWorldAgent:
                 mu[s] = 0 or 1 or 2 or 3, which represents the action in state s
         """
         mu = np.zeros((64,))
-        ### BEGIN SOLUTION
-        # YOUR CODE HERE
         stable = False
 
         while not stable:
@@ -126,7 +125,7 @@ class GridWorldAgent:
                     continue
                 max_value = float('-inf')
                 for cur_action in range(4):
-                    next_state = env.state_transition_func(cur_state, cur_action)
+                    next_state = self.env.state_transition_func(cur_state, cur_action)
                     reward = -1.5
                     if (cur_state, cur_action) in [(5, 1), (7, 3), (14, 0)] and next_state == 6:
                         reward = 10
@@ -134,7 +133,7 @@ class GridWorldAgent:
                     if value > max_value:
                         max_value = value
                         mu[cur_state] = cur_action
-                    if old_action != mu[cur_state]:
-                        stable = False
+                if old_action != mu[cur_state]:
+                    stable = False
 
         return mu
