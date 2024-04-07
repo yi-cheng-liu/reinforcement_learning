@@ -1,4 +1,4 @@
-# Value and Policy Iteration
+# Q Learning
 
 ## A Maze Game in Gridworld
 
@@ -40,19 +40,37 @@ The agent's goal is to find the optimal policy that maximizes the expected disco
 
     $r(5,1) = 10$, $r(7,3) = 10$, $r(14,0) = 10$. Otherwise, $r(s,a)$ is equal to $-1$ with probability $0.5$ and $-2$ with probability $0.5$.
 
-- *Objective*: Maximize the expected discounted total reward:
+### Q-Learning Framework
 
-    $$\mathbb{E} \left[\sum_{t=0}^{\tau - 1} \alpha^t r(s_t,a_t) | s_0=0 \right]$$
+Q-learning, a model-free reinforcement learning algorithm, enables the agent to determine the optimal action for each state through trial and error, without prior knowledge of the environment's dynamics.
 
-  where the subscript $t$ denotes the time slot, $\tau$ is the time slot when the agent reaches the terminal state $6$ starting from $s_0$, and $\alpha=0.9$ is the discount factor.
+![q-table](q-table.png)
 
-Note that in this problem the state transition is deterministic. Define a determinitic state transition function $f$ such that $s' = f(s,a)$ where $s$ is the current state, $a$ is the current action, and $s'$ is the next state. For example, $f(0,0)=0$, $f(0,1)=1$.
+**Update Formula**
+$$
+Q(s, a) \leftarrow Q(s, a) + \beta_k [r + \alpha \max_{a'}Q(s', a') - Q(s, a)]
+$$
+**Temporal Difference(TD)**: The difference between the new estimate and old estimate
+$$r + \alpha \max_{a'}Q(s', a') - Q(s, a)$$
 
-### Value Function
+- **Q-value $Q(s, a)$**: Represents the expected utility of taking action $a$ in state $s$.
 
-Let $V^*(s)$ denote the optimal value function, defined by
+- **Learning Rate $\beta$**: Determines the weighting of new information in Q-value updates.
 
-$$ V^*(s) = \max_{\mu} \mathbb{E} \left[\sum_{t=0}^{\tau - 1} \alpha^t r(s_t,\mu(s_t)) \vert s_0 = s \right] $$
+- **Discount Factor $\alpha$**: Weights future rewards against immediate rewards, usually sets at $0.9$.
+
+### Algorithm
+
+
+1. **Initialize** Q-values arbitrarily.
+2. **For each episode**:
+    - Initialize state $s$.
+    - **Repeat until $s$ is terminal**:
+        - Select action $a$ using an $\epsilon$-greedy policy based on Q.
+        - Execute action $a$, observe reward $r$, and next state $s'$.
+        - Update $Q(s, a)$ based on the observed reward and the maximum Q-value of the next state.
+        - Update state $s$ to $s'$.
+3. **Derive optimal policy** $\pi^*$ based on the final Q-values.
 
 ### Run
 
@@ -64,7 +82,7 @@ python train.py
 Your actions during the last episode:
 1 2 2 2 2 2 2 1 1 1 1 1 0 0 3 3 3 3 0 1 1 1 1 0 3 3 3 0 0 1 1 1 
 Your total reward averaged over 500 episodes:
--14.105
+-14.054
 ```
 
 ### Results
