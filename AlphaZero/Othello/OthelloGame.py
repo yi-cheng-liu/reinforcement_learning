@@ -1,5 +1,5 @@
-from Game import Game
-from OthelloLogic import Board
+from Othello.Game import Game
+from Othello.OthelloLogic import Board
 import numpy as np
 
 

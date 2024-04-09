@@ -42,22 +42,26 @@ The agent's goal is to find the optimal policy that maximizes the expected disco
 
 ### Q-Learning Framework
 
-Q-learning, a model-free reinforcement learning algorithm, enables the agent to determine the optimal action for each state through trial and error, without prior knowledge of the environment's dynamics.
+Q-learning is a model-free reinforcement learning method that allows an agent to learn the best actions to take in different states through trial and error, without needing prior knowledge. For example, teaching a robot how to navigate through a map, and the robot only have 4 steps to take, up ⬆️, right ➡️, down ⬇️, and left ⬅️.
 
-![q-table](q-table.png)
+By iteratively updating Q-values using the Bellman equation $
+V_k(j) = \max_{i \in N_k(j)}(r_k(j, i) + V_{k+1}(i))$, Q-learning gradually converges to the optimal Q-function. This makes the agent to choose actions that maximize expected returns from any state.
 
 **Update Formula**
+Adjusting the Q-value towards the new estimate promises a higher return in the given state. Overtime, the action is the state will have a more rewarding action.
 $$
 Q(s, a) \leftarrow Q(s, a) + \beta_k [r + \alpha \max_{a'}Q(s', a') - Q(s, a)]
 $$
 **Temporal Difference(TD)**: The difference between the new estimate and old estimate
 $$r + \alpha \max_{a'}Q(s', a') - Q(s, a)$$
 
-- **Q-value $Q(s, a)$**: Represents the expected utility of taking action $a$ in state $s$.
+- **Q-value $Q(s, a)$**: Estimated Q-value for action $u$ in state $x$
 
-- **Learning Rate $\beta$**: Determines the weighting of new information in Q-value updates.
+- **New Estimate $\alpha \max_{a'}Q(s', a')$**: A new estimate based on the received reward $r$ and the maximum estimated value of the next state $s'$
 
-- **Discount Factor $\alpha$**: Weights future rewards against immediate rewards, usually sets at $0.9$.
+- **Learning Rate $\beta$**: Learning rate, determines how fast new information in Q-value updates
+
+- **Discount Factor $\alpha$**: Weights future rewards against immediate rewards, usually sets at $0.9$
 
 ### Algorithm
 

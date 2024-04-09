@@ -6,6 +6,7 @@ import torch.nn.functional as F
 from Othello.Arena import Arena
 from tqdm import tqdm
 from random import shuffle
+import math
 
 class PolicyNet(nn.Module):
     def __init__(self, game):
@@ -56,7 +57,6 @@ class PolicyNet(nn.Module):
 
         return pi, v
 
-
 class MCTS:
     """
     This class handles the MCTS tree.
@@ -102,10 +102,14 @@ class MCTS:
             If (s,a) is not in self.Nsa, then s has not been visited.
             self.game.getActionSize() returns the number of actions, i.e., n*n+1.
         """
-        ### BEGIN SOLUTION
-        # YOUR CODE HERE
-        raise NotImplementedError()
-        ### END SOLUTION
+        s = self.game.stringRepresentation(canonicalBoard)
+        counts = [self.Nsa[(s, a)] if (s, a) in self.Nsa else 0 for a in range(self.game.getActionSize())]
+
+        if sum(counts) == 0:
+            return [1 / self.game.getActionSize()] * self.game.getActionSize()
+
+        probs = [x / sum(counts) for x in counts]
+
         return probs
 
     def search(self, canonicalBoard):
@@ -194,10 +198,14 @@ class MCTS:
                     self.Ns[s] stores the number of times board s was visited
                     self.Nsa[(s, a)] stores number of times edge s,a was visited
                 """
-                ### BEGIN SOLUTION
-                # YOUR CODE HERE
-                raise NotImplementedError()
-                ### END SOLUTION
+                if (s, a) in self.Qsa:
+                    u = self.Qsa[(s, a)] + self.bonus_term_factor * self.Ps[s][a] * math.sqrt(self.Ns[s]) / (1 + self.Nsa[(s, a)])
+                else:
+                    u = self.bonus_term_factor * self.Ps[s][a] * math.sqrt(self.Ns[s] + 1e-8)  # tiny positive number to prevent division by zero
+                    
+                if u > cur_best:
+                    cur_best = u
+                    best_act = a
         
         # Continue the simulation: take action best_act in the simulation
         a = best_act
@@ -215,17 +223,18 @@ class MCTS:
             self.Nsa[(s, a)] stores number of times edge s,a was visited
             v is the value for the current player
         """
-        ### BEGIN SOLUTION
-        # YOUR CODE HERE
-        raise NotImplementedError()
-        ### END SOLUTION
+        if (s, a) in self.Qsa:
+            self.Qsa[(s, a)] = (self.Nsa[(s, a)] * self.Qsa[(s, a)] + v) / (self.Nsa[(s, a)] + 1)
+            self.Nsa[(s, a)] += 1
+        else:
+            self.Qsa[(s, a)] = v
+            self.Nsa[(s, a)] = 1
         
         # Update the number of times that s has been visited
         self.Ns[s] += 1
         
         return -v
-    
-    
+
 class Coach():
     """
     This class executes the self-play + learning.
@@ -280,10 +289,30 @@ class Coach():
                         pi are the log probabilities of actions in state s;
                         v is the value of state s.
                 """
-                ### BEGIN SOLUTION
-                # YOUR CODE HERE
-                raise NotImplementedError()
-                ### END SOLUTION
+                batch_count = int(len(self.trainExamples) / self.batch_size)
+                for _ in range(batch_count):
+                    sample_indices = np.random.randint(len(self.trainExamples), size=self.batch_size)
+                    boards, pis, vs = list(zip(*[self.trainExamples[i] for i in sample_indices]))
+                    
+                    # Convert to PyTorch tensors
+                    boards = torch.FloatTensor(np.array(boards)).to(dtype=torch.float)
+                    target_pis = torch.FloatTensor(np.array(pis)).to(dtype=torch.float)
+                    target_vs = torch.FloatTensor(np.array(vs)).view(-1, 1).to(dtype=torch.float)
+                    
+                    # Zero the parameter gradients
+                    optimizer.zero_grad()
+                    
+                    # Forward pass
+                    output_pis, output_vs = self.nnet(boards)
+                    
+                    # Loss calculation
+                    l_pi = -torch.sum(target_pis * output_pis) / target_pis.size()[0]
+                    l_v = torch.sum((target_vs - output_vs) ** 2) / target_vs.size()[0]
+                    total_loss = l_pi + l_v
+                    
+                    # Backward pass and optimize
+                    total_loss.backward()
+                    optimizer.step()
             
             pmcts = MCTS(self.game, self.pnet)
             nmcts = MCTS(self.game, self.nnet)

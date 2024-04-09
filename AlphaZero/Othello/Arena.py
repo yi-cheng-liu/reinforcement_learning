@@ -1,6 +1,6 @@
 import logging
 
-from tqdm.notebook import tqdm
+from tqdm import tqdm
 
 log = logging.getLogger(__name__)
 
